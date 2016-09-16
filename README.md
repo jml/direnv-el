@@ -1,4 +1,10 @@
 # direnv-el
 
-Load direnv into the environment of an Emacs process.
+Load [direnv](http://direnv.net) into the environment of an Emacs process.
 
+Usage:
+
+```elisp
+(require 'direnv)
+(add-hook 'find-file-hook 'direnv-load-environment)
+```
