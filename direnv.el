@@ -31,16 +31,22 @@
 ;; This module integrates direnv with Emacs.
 ;;
 ;; The main function is 'direnv-load-environment', which exports the
-;; environment difference from direnv and applies it to 'process-environment',
-;; making the direnv environment settings available to any subprocess.
+;; environment difference from direnv and sets in globally within Emacs,
+;; making the direnv environment settings available to any subprocess.  When
+;; you change to a different buffer, the environment variable changes are
+;; reverted, thanks to the magic of direnv.
 ;;
-;; One way to use this is as a hook in find-file:
+;; One way to use this is as a hook in find-file and buffer-list-update-hook:
 ;;
 ;;    (add-hook 'find-file-hook 'direnv-load-environment)
+;;    (add-hook 'buffer-list-update-hook 'direnv-load-environment)
 
 ;;; Code:
 
 (require 'json)
+
+(defvar direnv--loading nil
+  "True if direnv is in the middle of loading environment variables.")
 
 (defun direnv--call-json-process (program &rest args)
   "Execute PROGRAM with ARGS, parsing stdout as JSON."
@@ -79,10 +85,14 @@ e.g.
   "Load the direnv environment for FILE-NAME.
 If FILE-NAME not provided, default to the current buffer."
   (interactive)
-  (let* ((fn (if file-name file-name buffer-file-name))
-         (json-key-type 'string)
-         (new-vars (direnv-export (file-name-directory fn))))
-    (direnv--update-environment new-vars)))
+  (unless (not direnv--loading)
+    (let ((direnv--loading t)
+          (fn (if file-name file-name buffer-file-name)))
+      (when fn
+        (let ((direnv--loading t)
+              (json-key-type 'string)
+              (new-vars (direnv-export (file-name-directory fn))))
+          (direnv--update-environment new-vars))))))
 
 (provide 'direnv)
 
