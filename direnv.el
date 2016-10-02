@@ -81,6 +81,7 @@ e.g.
   (direnv--format-env-var (\"foo\" . \"bar\")) ==> \"foo=bar\""
   (mapconcat 'identity (list (car env-var) (cdr env-var)) "="))
 
+;;;###autoload
 (defun direnv-load-environment (&optional file-name)
   "Load the direnv environment for FILE-NAME.
 If FILE-NAME not provided, default to the current buffer."
