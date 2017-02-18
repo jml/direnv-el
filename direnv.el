@@ -86,13 +86,13 @@ e.g.
   "Load the direnv environment for FILE-NAME.
 If FILE-NAME not provided, default to the current buffer."
   (interactive)
-  (unless (not direnv--loading)
     (let ((direnv--loading t)
           (fn (if file-name file-name buffer-file-name)))
+  (unless direnv--loading
       (when fn
-        (let ((direnv--loading t)
               (json-key-type 'string)
               (new-vars (direnv-export (file-name-directory fn))))
+        (let* ((direnv--loading t)
           (direnv--update-environment new-vars))))))
 
 (provide 'direnv)
