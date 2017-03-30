@@ -1,3 +1,9 @@
+
+**IMPORTANT NOTE**
+
+This project is obsolete. Please use https://github.com/wbolster/emacs-direnv instead.
+
+
 # direnv-el
 
 Load [direnv](http://direnv.net) into the environment of an Emacs process.
