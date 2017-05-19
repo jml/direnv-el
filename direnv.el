@@ -71,28 +71,21 @@ Pairs are (var-name . var-value)"
 
 ENV-VARS is a list of pairs of environment variables and their
 values."
-  (let ((new-vars (mapcar 'direnv--format-env-var env-vars)))
-    (setq process-environment (nconc new-vars process-environment))))
-
-(defun direnv--format-env-var (env-var)
-  "Format ENV-VAR for 'process-environment'.
-
-e.g.
-  (direnv--format-env-var (\"foo\" . \"bar\")) ==> \"foo=bar\""
-  (mapconcat 'identity (list (car env-var) (cdr env-var)) "="))
+  (mapc (lambda (env-var)
+          (setenv (car env-var) (cdr env-var)))
+        env-vars))
 
 ;;;###autoload
 (defun direnv-load-environment (&optional file-name)
   "Load the direnv environment for FILE-NAME.
 If FILE-NAME not provided, default to the current buffer."
   (interactive)
-  (unless (not direnv--loading)
-    (let ((direnv--loading t)
-          (fn (if file-name file-name buffer-file-name)))
+  (unless direnv--loading
+    (let ((fn (if file-name file-name buffer-file-name)))
       (when fn
-        (let ((direnv--loading t)
-              (json-key-type 'string)
-              (new-vars (direnv-export (file-name-directory fn))))
+        (let* ((direnv--loading t)
+               (json-key-type 'string)
+               (new-vars (direnv-export (file-name-directory fn))))
           (direnv--update-environment new-vars))))))
 
 (provide 'direnv)
